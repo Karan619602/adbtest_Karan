@@ -6,11 +6,11 @@ services:
     command: bash -c "cd /src/rest && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
-    links:
-      - mongo
     volumes:
       - ${ADBREW_CODEBASE_PATH}/tmp:/tmp
       - ${ADBREW_CODEBASE_PATH}:/src
+    networks:
+      - my_network
 
   app:
     build: .
@@ -20,15 +20,21 @@ services:
       - "3000:3000"
     volumes:
       - ${ADBREW_CODEBASE_PATH}:/src
+    networks:
+      - my_network
 
   mongo:
     build: .
     container_name: mongo
     restart: always
     ports:
-      - "27017:27017"
+      - "27018:27018"
     volumes:
       - ${ADBREW_CODEBASE_PATH}/db/:/data/db
     command: /usr/bin/mongod --bind_ip 0.0.0.0
+    networks:
+      - my_network
 
-    
+networks:
+  my_network:
+    driver: bridge
